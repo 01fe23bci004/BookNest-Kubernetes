@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: booknest-service
+  namespace: booknest
+spec:
+  type: ClusterIP
+  selector:
+    app: booknest
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8000
+      protocol: TCP

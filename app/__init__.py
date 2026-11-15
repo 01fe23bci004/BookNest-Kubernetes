@@ -1,0 +1,1 @@
+"""BookNest FastAPI application package."""

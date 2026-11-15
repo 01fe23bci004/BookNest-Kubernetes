@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#111827" />
+  <title>BookNest · Your library, beautifully organised</title>
+  <script>
+    // A fresh browser tab must authenticate again. This is deliberately session-only.
+    if (sessionStorage.getItem('booknestAuthenticated') !== 'yes') {
+      window.location.replace('/login');
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="#dashboard" aria-label="BookNest home">
+        <span class="brand-mark"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 7.5c4.3-1.7 8.1-1.2 11 1.1v17c-2.9-2.3-6.7-2.8-11-1.1z"/><path d="M27 7.5c-4.3-1.7-8.1-1.2-11 1.1v17c2.9-2.3 6.7-2.8 11-1.1z"/><path d="M16 8.8v17"/></svg></span>
+        <span class="brand-copy"><strong>booknest</strong><small>LIBRARY SPACE</small></span>
+      </a>
+      <div class="sidebar-label">WORKSPACE</div>
+      <nav class="nav-list" aria-label="Main navigation">
+        <button class="nav-item active" data-view="dashboard"><span class="nav-icon">▦</span> Overview</button>
+        <button class="nav-item" data-view="catalogue"><span class="nav-icon">▤</span> Book catalogue</button>
+        <button class="nav-item" data-view="circulation"><span class="nav-icon">⇄</span> Circulation</button>
+        <button class="nav-item" data-view="settings"><span class="nav-icon">⚙</span> Library settings</button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="help-card"><div class="help-icon">✦</div><strong>A little help?</strong><p>Need a hand managing the library?</p><a href="mailto:library@booknest.local">Contact librarian ↗</a></div>
+        <div class="profile-row"><div class="avatar">BN</div><div class="profile-copy"><strong>Librarian session</strong><small>Securely signed in</small></div><span class="profile-dot"></span></div>
+      </div>
+    </aside>
+
+    <main class="main-area">
+      <header class="topbar">
+        <div class="breadcrumb"><span>Workspace</span><span class="crumb-slash">/</span><strong id="breadcrumb-current">Overview</strong></div>
+        <div class="top-actions"><div class="live-status"><span class="live-dot"></span><span id="service-status">Service online</span></div><button class="icon-button" id="refresh-btn" title="Refresh data" aria-label="Refresh data">↻</button><button class="admin-button signout-button" id="logout-btn"><span>↪</span> Sign out</button></div>
+      </header>
+
+      <section class="view active-view" id="view-dashboard">
+        <div class="welcome-row"><div><div class="eyebrow" id="today-label">YOUR LIBRARY, AT A GLANCE</div><h1>Good day, <em>reader.</em></h1><p class="subheading">A calm space for curious minds. Here's what's happening in your library.</p></div><div class="hours-pill"><span class="hours-icon">◷</span><div><small>LIBRARY HOURS</small><strong id="library-hours">09:00 AM – 05:00 PM</strong></div></div></div>
+        <div class="announcement" id="announcement-card"><div class="announcement-icon">✦</div><div><small>FROM THE LIBRARY</small><p id="announcement-text">Loading the latest library note…</p></div><span class="announcement-tag">NOTICE</span></div>
+        <div class="section-heading"><div><h2>Library overview</h2><p>A quick look at your collection and activity.</p></div><span class="updated-label" id="updated-label">Updating…</span></div>
+        <div class="stats-grid">
+          <article class="stat-card stat-primary"><div class="stat-top"><span class="stat-label">BOOK TITLES</span><span class="stat-symbol">▤</span></div><div class="stat-number" id="stat-titles">—</div><div class="stat-foot"><span class="stat-foot-note">Unique titles in collection</span></div><div class="stat-decoration decor-book">▤</div></article>
+          <article class="stat-card"><div class="stat-top"><span class="stat-label">AVAILABLE COPIES</span><span class="stat-symbol mint">⌑</span></div><div class="stat-number" id="stat-available">—</div><div class="stat-foot"><span class="status-mini green"></span><span class="stat-foot-note">Ready to be discovered</span></div></article>
+          <article class="stat-card"><div class="stat-top"><span class="stat-label">CURRENTLY ISSUED</span><span class="stat-symbol peach">↗</span></div><div class="stat-number" id="stat-issued">—</div><div class="stat-foot"><span class="stat-foot-note">Books with readers</span></div></article>
+          <article class="stat-card"><div class="stat-top"><span class="stat-label">ACTIVE READERS</span><span class="stat-symbol lavender">♙</span></div><div class="stat-number" id="stat-readers">—</div><div class="stat-foot"><span class="stat-foot-note">Students with active loans</span></div></article>
+        </div>
+        <div class="dashboard-columns">
+          <section class="panel collection-panel"><div class="panel-heading"><div><h3>Discover something new</h3><p>A few picks from the shelves.</p></div><button class="text-link" data-go="catalogue">View catalogue <span>→</span></button></div><div class="featured-books" id="featured-books"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></div></section>
+          <section class="panel activity-panel"><div class="panel-heading"><div><h3>Recent circulation</h3><p>Latest borrowing activity.</p></div><button class="more-button" data-go="circulation">•••</button></div><div class="activity-list" id="recent-activity"><div class="empty-small">Loading activity…</div></div></section>
+        </div>
+        <footer class="page-footer"><span>Made for lifelong learners.</span><span id="pod-indicator">Runtime · checking pod</span></footer>
+      </section>
+
+      <section class="view" id="view-catalogue">
+        <div class="page-title-row"><div><div class="eyebrow">THE COLLECTION</div><h1>Book <em>catalogue.</em></h1><p class="subheading">Find your next favourite, one page at a time.</p></div><button class="primary-button" id="add-book-btn">＋ Add a book</button></div>
+        <div class="toolbar"><label class="search-box"><span>⌕</span><input id="book-search" type="search" placeholder="Search by title, author or category…" autocomplete="off" /></label><span class="result-count" id="book-count">Loading books…</span></div>
+        <div class="book-grid" id="book-grid"></div>
+      </section>
+
+      <section class="view" id="view-circulation">
+        <div class="page-title-row"><div><div class="eyebrow">BORROW & RETURN</div><h1>Library <em>circulation.</em></h1><p class="subheading">Keep the good stories moving from one reader to another.</p></div><div class="policy-pill"><span>↗</span><div><small>LOAN POLICY</small><strong id="loan-policy">Up to 3 books per student</strong></div></div></div>
+        <div class="circulation-grid">
+          <section class="panel issue-panel"><div class="panel-heading"><div><h3>Issue a book</h3><p>Register a new borrowing record.</p></div><span class="form-step">01</span></div><form id="issue-form" class="stack-form"><label>Choose a book<select id="issue-book" required><option value="">Select from catalogue</option></select></label><div class="form-two"><label>Student name<input id="student-name" required minlength="2" placeholder="e.g. Aisha Khan" /></label><label>Student ID<input id="student-id" required minlength="2" placeholder="e.g. 23CS041" /></label></div><button class="primary-button full-button" type="submit">Confirm issue <span>→</span></button><p class="form-footnote">Available copies are updated as soon as the issue is recorded.</p></form></section>
+          <section class="panel loan-panel"><div class="panel-heading"><div><h3>Borrowing records</h3><p>Active loans and recent returns.</p></div><span class="record-count" id="loan-count">0 records</span></div><div class="table-wrap"><table><thead><tr><th>READER</th><th>BOOK</th><th>ISSUED</th><th>STATUS / ACTION</th></tr></thead><tbody id="loan-table"><tr><td colspan="4" class="table-empty">No borrowing records yet.</td></tr></tbody></table></div></section>
+        </div>
+      </section>
+
+      <section class="view" id="view-settings">
+        <div class="page-title-row"><div><div class="eyebrow">BEHIND THE SHELVES</div><h1>Library <em>settings.</em></h1><p class="subheading">Runtime configuration supplied by your Kubernetes cluster.</p></div><button class="outline-button" id="settings-refresh">↻ Refresh configuration</button></div>
+        <div class="settings-banner"><div class="settings-banner-icon">⌘</div><div><strong>Configuration lives outside the application image.</strong><p>BookNest reads public library settings from a ConfigMap and administrator credentials from a Kubernetes Secret.</p></div><span class="k8s-badge">KUBERNETES</span></div>
+        <div class="settings-grid">
+          <section class="panel config-panel"><div class="panel-heading"><div><span class="panel-kicker">01 / PUBLIC SETTINGS</span><h3>ConfigMap</h3><p>These values are safe to display in the application.</p></div><span class="resource-icon config-icon">▤</span></div><div class="config-list" id="config-list"><div class="config-row"><span>Reading configuration…</span></div></div><div class="source-footer"><span class="source-dot"></span> Mounted file · /etc/booknest/config/config.json</div></section>
+          <section class="panel secret-panel"><div class="panel-heading"><div><span class="panel-kicker">02 / PROTECTED VALUES</span><h3>Kubernetes Secret</h3><p>Credentials are loaded but never displayed.</p></div><span class="resource-icon secret-icon">◇</span></div><div class="secret-state"><div class="lock-orb">⌑</div><div><strong id="secret-state-title">Checking secret mount…</strong><p id="secret-state-copy">Verifying environment and mounted file sources.</p></div></div><div class="secret-checks" id="secret-checks"></div><div class="source-footer"><span class="source-dot purple-dot"></span> Mounted file · /etc/booknest/secrets/credentials.json</div></section>
+        </div>
+        <section class="panel runtime-panel"><div class="panel-heading"><div><span class="panel-kicker">03 / LIVE RUNTIME</span><h3>Application instance</h3><p>Identify which Kubernetes pod answered this request.</p></div><span class="runtime-live"><i></i> LIVE</span></div><div class="runtime-details"><div><small>APPLICATION</small><strong>BookNest Library Portal</strong></div><div><small>POD NAME</small><strong class="mono" id="runtime-pod">—</strong></div><div><small>HEALTH CHECK</small><strong class="health-good" id="runtime-health">Checking…</strong></div><div><small>CONFIG FILE</small><strong id="runtime-config">Checking…</strong></div></div><div class="runtime-note">Tip: refresh this page after updating the ConfigMap. Mounted files can refresh after Kubernetes' projection delay; environment variables change only when pods are recreated.</div></section>
+      </section>
+
+      <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="add-modal"><div class="modal"><button class="modal-close" data-close="add-modal" aria-label="Close">×</button><div class="modal-symbol">＋</div><div class="eyebrow">GROW THE COLLECTION</div><h2>Add a <em>new title.</em></h2><p class="modal-copy">Add a book to the catalogue. Librarian access is required.</p><form id="add-book-form" class="stack-form"><label>Book title<input id="new-title" required minlength="2" placeholder="Book title" /></label><div class="form-two"><label>Author<input id="new-author" required minlength="2" placeholder="Author name" /></label><label>Category<input id="new-category" required minlength="2" placeholder="e.g. Technology" /></label></div><div class="form-two"><label>ISBN<input id="new-isbn" required minlength="5" placeholder="ISBN number" /></label><label>Copies<input id="new-copies" type="number" min="1" max="100" value="1" required /></label></div><button class="primary-button full-button" type="submit">Add to catalogue <span>→</span></button></form></div></div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

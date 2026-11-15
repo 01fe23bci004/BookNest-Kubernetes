@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#14251f" />
+  <title>Sign in · BookNest Library</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/login.css" />
+</head>
+<body>
+  <main class="login-shell">
+    <section class="brand-panel" aria-label="BookNest introduction">
+      <div class="brand-top">
+        <a class="brand" href="/login" aria-label="BookNest sign in">
+          <span class="brand-mark"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 7.5c4.3-1.7 8.1-1.2 11 1.1v17c-2.9-2.3-6.7-2.8-11-1.1z"/><path d="M27 7.5c-4.3-1.7-8.1-1.2-11 1.1v17c2.9-2.3 6.7-2.8 11-1.1z"/><path d="M16 8.8v17"/></svg></span>
+          <span><strong>booknest</strong><small>LIBRARY SPACE</small></span>
+        </a>
+        <span class="secure-label"><i></i> PRIVATE LIBRARY PORTAL</span>
+      </div>
+
+      <div class="brand-message">
+        <div class="eyebrow">A QUIETER WAY TO MANAGE KNOWLEDGE</div>
+        <h1>Every great story<br>starts with <em>access.</em></h1>
+        <p>Welcome to your library workspace. Keep the collection organised, help readers find their next favourite, and make every book count.</p>
+        <div class="quote-card">
+          <span class="quote-mark">“</span>
+          <p>A library is not a luxury but one of the necessities of life.</p>
+          <small>— Henry Ward Beecher</small>
+        </div>
+      </div>
+
+      <div class="brand-bottom">
+        <div class="book-stack" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+        <div><strong>A space for curious minds.</strong><small>Thoughtfully organised. Ready to explore.</small></div>
+        <span class="edition">EST. 2026</span>
+      </div>
+      <div class="decor decor-one"></div><div class="decor decor-two"></div>
+    </section>
+
+    <section class="form-panel" aria-label="Librarian sign in">
+      <div class="form-topline"><span>BOOKNEST / LIBRARY DESK</span><span class="online"><i></i> SYSTEM ONLINE</span></div>
+      <div class="login-card">
+        <div class="welcome-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/><path d="M18.5 8.5h3m-1.5-1.5v3"/></svg></div>
+        <div class="eyebrow">LIBRARIAN AUTHENTICATION</div>
+        <h2>Welcome <em>back.</em></h2>
+        <p class="intro">Sign in to continue to your BookNest workspace.</p>
+
+        <form id="login-form" novalidate>
+          <label for="username">Username</label>
+          <div class="input-wrap"><span class="input-icon">♙</span><input id="username" name="username" type="text" autocomplete="username" placeholder="Enter your librarian ID" required autofocus></div>
+          <div class="password-heading"><label for="password">Password</label><span>PROTECTED BY KUBERNETES SECRET</span></div>
+          <div class="input-wrap"><span class="input-icon">◇</span><input id="password" name="password" type="password" autocomplete="current-password" placeholder="Enter your password" required><button type="button" class="toggle-password" id="toggle-password" aria-label="Show password">Show</button></div>
+          <div class="form-options"><span><i class="shield-icon">✓</i> Secure session sign-in</span><span>Session-only access</span></div>
+          <button class="submit-button" type="submit"><span>Sign in to BookNest</span><b>→</b></button>
+          <div class="error-message" id="login-error" role="alert" aria-live="polite"></div>
+        </form>
+        <div class="login-note"><span class="lock-icon">▣</span><p>Your session is private to this browser tab. Close the app and sign in again when you return.</p></div>
+      </div>
+      <footer class="form-footer"><span>© 2026 BookNest Library</span><span>BUILT FOR LIFELONG LEARNING</span></footer>
+    </section>
+  </main>
+
+  <script>
+    const form = document.getElementById('login-form');
+    const errorBox = document.getElementById('login-error');
+    const submitButton = form.querySelector('button[type="submit"]');
+    document.getElementById('toggle-password').addEventListener('click', () => {
+      const field = document.getElementById('password');
+      const reveal = field.type === 'password';
+      field.type = reveal ? 'text' : 'password';
+      document.getElementById('toggle-password').textContent = reveal ? 'Hide' : 'Show';
+    });
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      errorBox.textContent = '';
+      submitButton.disabled = true;
+      submitButton.querySelector('span').textContent = 'Verifying access…';
+      try {
+        const response = await fetch('/api/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin',
+          body: JSON.stringify({
+            username: document.getElementById('username').value.trim(),
+            password: document.getElementById('password').value
+          })
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.detail || 'Unable to sign in. Check your credentials.');
+        sessionStorage.setItem('booknestAuthenticated', 'yes');
+        sessionStorage.setItem('booknestTabToken', data.tab_token);
+        window.location.replace('/');
+      } catch (error) {
+        errorBox.textContent = error.message || 'Sign-in failed. Please try again.';
+        submitButton.disabled = false;
+        submitButton.querySelector('span').textContent = 'Sign in to BookNest';
+      }
+    });
+  </script>
+</body>
+</html>

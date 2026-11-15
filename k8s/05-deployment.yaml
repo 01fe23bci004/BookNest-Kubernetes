@@ -1,0 +1,120 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: booknest
+  namespace: booknest
+  labels:
+    app: booknest
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: booknest
+  template:
+    metadata:
+      labels:
+        app: booknest
+    spec:
+      containers:
+        - name: booknest
+          image: booknest:2.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8000
+          env:
+            - name: LIBRARY_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: booknest-config
+                  key: LIBRARY_NAME
+            - name: LIBRARY_HOURS
+              valueFrom:
+                configMapKeyRef:
+                  name: booknest-config
+                  key: LIBRARY_HOURS
+            - name: MAX_BOOKS_PER_STUDENT
+              valueFrom:
+                configMapKeyRef:
+                  name: booknest-config
+                  key: MAX_BOOKS_PER_STUDENT
+            - name: LATE_RETURN_FEE
+              valueFrom:
+                configMapKeyRef:
+                  name: booknest-config
+                  key: LATE_RETURN_FEE
+            - name: ANNOUNCEMENT
+              valueFrom:
+                configMapKeyRef:
+                  name: booknest-config
+                  key: ANNOUNCEMENT
+            - name: LIBRARY_THEME
+              valueFrom:
+                configMapKeyRef:
+                  name: booknest-config
+                  key: LIBRARY_THEME
+            - name: ADMIN_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: booknest-admin-secret
+                  key: ADMIN_USERNAME
+            - name: ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: booknest-admin-secret
+                  key: ADMIN_PASSWORD
+            - name: SESSION_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: booknest-admin-secret
+                  key: SESSION_SECRET_KEY
+            - name: DB_PATH
+              value: /data/booknest.db
+            - name: CONFIG_FILE
+              value: /etc/booknest/config/config.json
+            - name: SECRET_FILE
+              value: /etc/booknest/secrets/credentials.json
+          volumeMounts:
+            - name: library-data
+              mountPath: /data
+            - name: app-config
+              mountPath: /etc/booknest/config
+              readOnly: true
+            - name: admin-secret
+              mountPath: /etc/booknest/secrets
+              readOnly: true
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+      volumes:
+        - name: library-data
+          persistentVolumeClaim:
+            claimName: booknest-data-pvc
+        - name: app-config
+          configMap:
+            name: booknest-config
+            items:
+              - key: config.json
+                path: config.json
+        - name: admin-secret
+          secret:
+            secretName: booknest-admin-secret
+            items:
+              - key: credentials.json
+                path: credentials.json

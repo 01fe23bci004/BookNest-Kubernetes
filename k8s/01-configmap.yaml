@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: booknest-config
+  namespace: booknest
+data:
+  LIBRARY_NAME: "BookNest Library"
+  LIBRARY_HOURS: "09:00 AM - 05:00 PM"
+  MAX_BOOKS_PER_STUDENT: "3"
+  LATE_RETURN_FEE: "5 INR per day"
+  ANNOUNCEMENT: "New arrivals are on the front shelf. Happy reading!"
+  LIBRARY_THEME: "sage"
+  config.json: |
+    {
+      "LIBRARY_NAME": "BookNest Library",
+      "LIBRARY_HOURS": "09:00 AM - 05:00 PM",
+      "MAX_BOOKS_PER_STUDENT": "3",
+      "LATE_RETURN_FEE": "5 INR per day",
+      "ANNOUNCEMENT": "New arrivals are on the front shelf. Happy reading!",
+      "LIBRARY_THEME": "sage"
+    }
